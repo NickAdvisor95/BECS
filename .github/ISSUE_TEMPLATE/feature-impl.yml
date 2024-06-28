@@ -17,7 +17,7 @@ body:
         **CLEARLY DESCRIBE A FEATURE YOU ARE GOING TO IMPLEMENT,
         YOU CAN ADD PICTURES IF YOU WANT TO:**
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Steps to implement the feature
@@ -34,4 +34,4 @@ body:
         **TO DO THAT, SIMPLY CLICK ON THE `Task list` BUTTON:**
         ![](https://github.com/alechkos/vzou/assets/93551621/5798c8a3-efc9-4ed9-ba18-da93cbebd46b)
     validations:
-      required: true
+      required: false
