@@ -1,0 +1,9 @@
+# IDE
+/.idea
+/.awcache
+/.vscode
+/.devcontainer
+/.classpath
+/.project
+/.settings
+*.code-workspace

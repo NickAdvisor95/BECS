@@ -1,0 +1,29 @@
+name: Set End Issue Date
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  set-end-issue-date:
+    name: Set End Issue Date
+    if: github.event.action == 'closed' && github.event.issue.assignees[0] != null
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Manager
+        id: get-manager
+        run: echo "::set-output name=manager::${{ toJson(github.repository_owner) }}"
+
+      - name: Get Current Date
+        id: get-current-date
+        run: echo "::set-output name=date::$(TZ=':Asia/Jerusalem' date +'%Y-%m-%dT%H:%M:%S%:z')"
+
+      - name: Set End Date
+        uses: leonsteinhaeuser/project-beta-automations@v2.2.1
+        with:
+          gh_token: ${{ secrets.PAC_TOKEN }}
+          user: ${{ steps.get-manager.outputs.manager }}
+          project_id: 2
+          resource_node_id: ${{ github.event.issue.node_id }}
+          operation_mode: custom_field
+          custom_field_values: '[{\"name\": \"End date\",\"type\": \"date\",\"value\": \"${{ steps.get-current-date.outputs.date }}\"}]'

@@ -1,0 +1,26 @@
+name: Set Assigned Issue Status
+on:
+  issues:
+    types:
+      - assigned
+
+env:
+  in_progress: In Progress
+
+jobs:
+  set-assigned-issue-status:
+    name: Set Assigned Issue Status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Manager
+        id: get-manager
+        run: echo "::set-output name=manager::${{ toJson(github.repository_owner) }}"
+
+      - name: Set Issue Status
+        uses: leonsteinhaeuser/project-beta-automations@v2.2.1
+        with:
+          gh_token: ${{ secrets.PAC_TOKEN }}
+          user: ${{ steps.get-manager.outputs.manager }}
+          project_id: 2
+          resource_node_id: ${{ github.event.issue.node_id }}
+          status_value: ${{ env.in_progress }}
