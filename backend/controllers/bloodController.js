@@ -60,8 +60,6 @@ const requestBlood = async (req, res) => {
         "No inventory found for this blood type or not enough blood in inventory"
       );
       const alternatives = await findAlternativeBloodTypes(bloodType);
-      const availableAlternatives = [];
-
       const priorityOrder = ["A+", "O+", "B+", "AB+", "A-", "O-", "B-", "AB-"];
 
       for (const altType of priorityOrder) {
@@ -70,22 +68,18 @@ const requestBlood = async (req, res) => {
             where: { bloodType: altType },
           });
           if (altInventory && altInventory.amount >= amount) {
-            availableAlternatives.push(altType);
+            return res.status(200).json({
+              message: "Requested blood type not available",
+              alternatives: [altType],
+            });
           }
         }
       }
 
-      if (availableAlternatives.length > 0) {
-        return res.status(200).json({
-          message: "Requested blood type not available",
-          alternatives: availableAlternatives,
-        });
-      } else {
-        return res.status(200).json({
-          message:
-            "Requested blood type not available and no suitable alternatives",
-        });
-      }
+      return res.status(200).json({
+        message:
+          "Requested blood type not available and no suitable alternatives",
+      });
     }
 
     inventory.amount -= amount;
