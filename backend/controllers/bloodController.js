@@ -1,17 +1,15 @@
-const { BloodDonation, BloodInventory } = require("../models");
+const { BloodDonation, BloodInventory, BloodType } = require("../models");
 
-// Функция для получения инвентаря крови
-const getBloodInventory = async (req, res) => {
-  try {
-    const inventory = await BloodInventory.findAll();
-    res.status(200).json(inventory);
-  } catch (error) {
-    console.error("Error fetching blood inventory:", error);
-    res.status(500).json({ message: "Failed to fetch blood inventory" });
+// Функция для поиска альтернативных типов крови
+const findAlternativeBloodTypes = async (bloodType) => {
+  const bloodTypeRecord = await BloodType.findOne({ where: { bloodType } });
+  if (bloodTypeRecord) {
+    return bloodTypeRecord.receiveBloodFrom.split(", ");
   }
+  return [];
 };
 
-// Функция для добавления донации
+// Функция для добавления донации крови
 const addDonation = async (req, res) => {
   try {
     const {
@@ -33,15 +31,13 @@ const addDonation = async (req, res) => {
       isUsed: false,
     });
 
+    // Обновление таблицы blood_inventory
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
     if (inventory) {
       inventory.amount += 1;
       await inventory.save();
     } else {
-      await BloodInventory.create({
-        bloodType,
-        amount: 1,
-      });
+      await BloodInventory.create({ bloodType, amount: 1 });
     }
 
     res.status(201).json(newDonation);
@@ -59,22 +55,15 @@ const requestBlood = async (req, res) => {
 
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
 
-    if (!inventory) {
-      console.log("No inventory found for this blood type");
-      const alternatives = await findAlternativeBloodTypes(bloodType);
-      return res
-        .status(200)
-        .json({ message: "Requested blood type not available", alternatives });
-    }
-
-    if (inventory.amount < amount) {
+    if (!inventory || inventory.amount < amount) {
       console.log(
-        `Not enough blood in inventory. Available: ${inventory.amount}, Requested: ${amount}`
+        "No inventory found for this blood type or not enough blood in inventory"
       );
       const alternatives = await findAlternativeBloodTypes(bloodType);
-      return res
-        .status(200)
-        .json({ message: "Requested blood type not available", alternatives });
+      return res.status(200).json({
+        message: "Requested blood type not available",
+        alternatives,
+      });
     }
 
     inventory.amount -= amount;
@@ -89,12 +78,19 @@ const requestBlood = async (req, res) => {
   }
 };
 
-const findAlternativeBloodTypes = async (bloodType) => {
-  // Логика поиска альтернативных типов крови
+// Функция для получения инвентаря крови
+const getBloodInventory = async (req, res) => {
+  try {
+    const inventory = await BloodInventory.findAll();
+    res.status(200).json(inventory);
+  } catch (error) {
+    console.error("Error fetching blood inventory:", error);
+    res.status(500).json({ message: "Failed to fetch blood inventory" });
+  }
 };
 
 module.exports = {
   addDonation,
   requestBlood,
-  getBloodInventory, // Убедитесь, что функция экспортируется
+  getBloodInventory,
 };
