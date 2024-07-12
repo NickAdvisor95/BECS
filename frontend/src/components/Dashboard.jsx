@@ -85,20 +85,26 @@ const Dashboard = () => {
         bloodType: requestBloodType,
         amount,
       });
-      if (response.alternatives.length > 0) {
+      console.log("Response:", response);
+
+      if (response.message === "Blood requested successfully") {
+        alert("Blood requested successfully!");
+      } else if (response.alternatives) {
         setAlternativeBloodTypes(response.alternatives);
         alert(
           "Requested blood type not available. Alternatives: " +
             response.alternatives.join(", ")
         );
       } else {
-        alert("Blood requested successfully!");
+        alert(response.message || "Unknown error");
       }
+
       setShowRequestBloodForm(false);
       setRequestBloodType("");
       setAmount(0);
       setAlternativeBloodTypes([]);
     } catch (error) {
+      console.error("Failed to request blood:", error);
       alert("Failed to request blood");
     }
   };

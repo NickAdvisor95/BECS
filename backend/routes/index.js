@@ -14,7 +14,7 @@ router.post("/login", login);
 router.post("/change-password", authenticate, changePassword);
 router.post("/add-user", authenticate, isAdmin, addUser);
 router.post("/add-donation", authenticate, addDonation);
-router.get("/blood-inventory", authenticate, getBloodInventory);
+router.get("/blood-inventory", authenticate, getBloodInventory); // Убедитесь, что getBloodInventory определен
 router.post("/request-blood", authenticate, requestBlood);
 
 module.exports = router;
