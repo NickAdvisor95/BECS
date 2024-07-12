@@ -47,7 +47,7 @@ const addDonation = async (req, res) => {
   }
 };
 
-// Функция для запроса крови
+// Функция для запроса крови с учетом альтернатив и редкости
 const requestBlood = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
@@ -60,10 +60,32 @@ const requestBlood = async (req, res) => {
         "No inventory found for this blood type or not enough blood in inventory"
       );
       const alternatives = await findAlternativeBloodTypes(bloodType);
-      return res.status(200).json({
-        message: "Requested blood type not available",
-        alternatives,
-      });
+      const availableAlternatives = [];
+
+      const priorityOrder = ["A+", "O+", "B+", "AB+", "A-", "O-", "B-", "AB-"];
+
+      for (const altType of priorityOrder) {
+        if (alternatives.includes(altType)) {
+          const altInventory = await BloodInventory.findOne({
+            where: { bloodType: altType },
+          });
+          if (altInventory && altInventory.amount >= amount) {
+            availableAlternatives.push(altType);
+          }
+        }
+      }
+
+      if (availableAlternatives.length > 0) {
+        return res.status(200).json({
+          message: "Requested blood type not available",
+          alternatives: availableAlternatives,
+        });
+      } else {
+        return res.status(200).json({
+          message:
+            "Requested blood type not available and no suitable alternatives",
+        });
+      }
     }
 
     inventory.amount -= amount;
