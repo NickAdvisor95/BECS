@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userService from "../services/userService";
 import bloodService from "../services/bloodService";
+import "./Dashboard.css"; // Подключаем наш CSS файл
 
 const Dashboard = () => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -155,69 +156,85 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
+    <div className="dashboard-container">
       <h1>Welcome to the Dashboard</h1>
 
-      {isAdmin && (
-        <>
-          <button onClick={() => setShowAddUserForm(!showAddUserForm)}>
-            {showAddUserForm ? "Close Form" : "Add User"}
-          </button>
-          {showAddUserForm && (
-            <form onSubmit={handleAddUser}>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-              />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-              />
-              <label>
-                Admin:
-                <input
-                  type="checkbox"
-                  checked={role.isAdmin}
-                  onChange={(e) =>
-                    setRole({ ...role, isAdmin: e.target.checked })
-                  }
-                />
-              </label>
-              <label>
-                Regular User:
-                <input
-                  type="checkbox"
-                  checked={role.isRegularUser}
-                  onChange={(e) =>
-                    setRole({ ...role, isRegularUser: e.target.checked })
-                  }
-                />
-              </label>
-              <label>
-                Research Student:
-                <input
-                  type="checkbox"
-                  checked={role.isResearchStudent}
-                  onChange={(e) =>
-                    setRole({ ...role, isResearchStudent: e.target.checked })
-                  }
-                />
-              </label>
-              <button type="submit">Create User</button>
-            </form>
-          )}
-        </>
+      <div className="dashboard-buttons">
+        {isAdmin && (
+          <>
+            <button onClick={() => setShowAddUserForm(!showAddUserForm)}>
+              {showAddUserForm ? "Close Form" : "Add User"}
+            </button>
+          </>
+        )}
+
+        <button onClick={() => setShowAddDonationForm(!showAddDonationForm)}>
+          {showAddDonationForm ? "Close Form" : "Add Donation"}
+        </button>
+
+        <button onClick={() => setShowRequestBloodForm(!showRequestBloodForm)}>
+          {showRequestBloodForm ? "Close Form" : "Request Blood"}
+        </button>
+
+        <button
+          onClick={() =>
+            setShowRequestBloodEmergencyForm(!showRequestBloodEmergencyForm)
+          }
+        >
+          {showRequestBloodEmergencyForm
+            ? "Close Form"
+            : "Request Blood Emergency"}
+        </button>
+      </div>
+
+      {showAddUserForm && (
+        <form onSubmit={handleAddUser}>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+          <label>
+            Admin:
+            <input
+              type="checkbox"
+              checked={role.isAdmin}
+              onChange={(e) => setRole({ ...role, isAdmin: e.target.checked })}
+            />
+          </label>
+          <label>
+            Regular User:
+            <input
+              type="checkbox"
+              checked={role.isRegularUser}
+              onChange={(e) =>
+                setRole({ ...role, isRegularUser: e.target.checked })
+              }
+            />
+          </label>
+          <label>
+            Research Student:
+            <input
+              type="checkbox"
+              checked={role.isResearchStudent}
+              onChange={(e) =>
+                setRole({ ...role, isResearchStudent: e.target.checked })
+              }
+            />
+          </label>
+          <button type="submit">Create User</button>
+        </form>
       )}
 
-      <button onClick={() => setShowAddDonationForm(!showAddDonationForm)}>
-        {showAddDonationForm ? "Close Form" : "Add Donation"}
-      </button>
       {showAddDonationForm && (
         <form onSubmit={handleAddDonation}>
           <input
@@ -269,9 +286,6 @@ const Dashboard = () => {
         </form>
       )}
 
-      <button onClick={() => setShowRequestBloodForm(!showRequestBloodForm)}>
-        {showRequestBloodForm ? "Close Form" : "Request Blood"}
-      </button>
       {showRequestBloodForm && (
         <form onSubmit={handleRequestBlood}>
           <input
@@ -292,15 +306,6 @@ const Dashboard = () => {
         </form>
       )}
 
-      <button
-        onClick={() =>
-          setShowRequestBloodEmergencyForm(!showRequestBloodEmergencyForm)
-        }
-      >
-        {showRequestBloodEmergencyForm
-          ? "Close Form"
-          : "Request Blood Emergency"}
-      </button>
       {showRequestBloodEmergencyForm && (
         <form onSubmit={handleRequestBloodEmergency}>
           <input

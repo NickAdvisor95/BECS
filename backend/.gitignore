@@ -1,6 +1,7 @@
 # dependencies
 node_modules/
-
+#db info
+config/config.json
 # Vim
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
