@@ -110,7 +110,15 @@ const Dashboard = () => {
       setAlternativeBloodTypes([]);
     } catch (error) {
       console.error("Failed to request blood:", error);
-      alert("Failed to request blood");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message);
+      } else {
+        alert("Failed to request blood");
+      }
     }
   };
 
@@ -134,7 +142,15 @@ const Dashboard = () => {
       setAmountEmergency(0);
     } catch (error) {
       console.error("Failed to request blood in emergency:", error);
-      alert("Failed to request blood in emergency");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message);
+      } else {
+        alert("Failed to request blood in emergency");
+      }
     }
   };
 
