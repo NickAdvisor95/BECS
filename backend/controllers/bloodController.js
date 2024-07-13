@@ -53,15 +53,6 @@ const requestBlood = async (req, res) => {
     const { bloodType, amount } = req.body;
     console.log(`Requesting ${amount} units of blood type ${bloodType}`);
 
-    if (bloodType === "O-" && amount > 1) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Cannot request more than 1 unit of O- blood at a time in regular mode",
-        });
-    }
-
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
 
     if (!inventory || inventory.amount < amount) {
@@ -91,6 +82,13 @@ const requestBlood = async (req, res) => {
       });
     }
 
+    if (bloodType === "O-" && amount > 1) {
+      return res.status(400).json({
+        message:
+          "You can only request 1 unit of O- blood at a time in regular mode",
+      });
+    }
+
     inventory.amount -= amount;
     await inventory.save();
     console.log(
@@ -106,20 +104,21 @@ const requestBlood = async (req, res) => {
 // Функция для запроса крови в чрезвычайной ситуации
 const requestBloodEmergency = async (req, res) => {
   try {
-    const { amount } = req.body;
-    console.log(`Requesting ${amount} units of blood type O- in emergency`);
+    const { bloodType, amount } = req.body;
+    console.log(
+      `Requesting ${amount} units of blood type ${bloodType} in emergency`
+    );
 
-    const inventory = await BloodInventory.findOne({
-      where: { bloodType: "O-" },
-    });
+    const inventory = await BloodInventory.findOne({ where: { bloodType } });
 
     if (!inventory || inventory.amount < amount) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Requested blood type O- not available in the required amount",
-        });
+      console.log(
+        "No inventory found for this blood type or not enough blood in inventory"
+      );
+      return res.status(200).json({
+        message:
+          "Requested blood type not available and no suitable alternatives in emergency",
+      });
     }
 
     inventory.amount -= amount;
@@ -150,6 +149,6 @@ const getBloodInventory = async (req, res) => {
 module.exports = {
   addDonation,
   requestBlood,
-  getBloodInventory,
   requestBloodEmergency,
+  getBloodInventory,
 };

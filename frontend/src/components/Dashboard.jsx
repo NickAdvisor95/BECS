@@ -28,6 +28,9 @@ const Dashboard = () => {
 
   const [requestBloodType, setRequestBloodType] = useState("");
   const [amount, setAmount] = useState(0);
+  const [requestBloodTypeEmergency, setRequestBloodTypeEmergency] =
+    useState(""); // Поле для типа крови в чрезвычайной ситуации
+  const [amountEmergency, setAmountEmergency] = useState(0); // Поле для количества в чрезвычайной ситуации
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
   const navigate = useNavigate();
@@ -115,7 +118,8 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       const response = await bloodService.requestBloodEmergency({
-        amount,
+        bloodType: requestBloodTypeEmergency,
+        amount: amountEmergency,
       });
       console.log("Response:", response);
 
@@ -126,7 +130,8 @@ const Dashboard = () => {
       }
 
       setShowRequestBloodEmergencyForm(false);
-      setAmount(0);
+      setRequestBloodTypeEmergency("");
+      setAmountEmergency(0);
     } catch (error) {
       console.error("Failed to request blood in emergency:", error);
       alert("Failed to request blood in emergency");
@@ -283,9 +288,16 @@ const Dashboard = () => {
       {showRequestBloodEmergencyForm && (
         <form onSubmit={handleRequestBloodEmergency}>
           <input
+            type="text"
+            value={requestBloodTypeEmergency}
+            onChange={(e) => setRequestBloodTypeEmergency(e.target.value)}
+            placeholder="Blood Type"
+            required
+          />
+          <input
             type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={amountEmergency}
+            onChange={(e) => setAmountEmergency(e.target.value)}
             placeholder="Amount"
             required
           />
