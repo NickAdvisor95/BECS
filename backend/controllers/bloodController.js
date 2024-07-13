@@ -53,6 +53,15 @@ const requestBlood = async (req, res) => {
     const { bloodType, amount } = req.body;
     console.log(`Requesting ${amount} units of blood type ${bloodType}`);
 
+    if (bloodType === "O-" && amount > 1) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Cannot request more than 1 unit of O- blood at a time in regular mode",
+        });
+    }
+
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
 
     if (!inventory || inventory.amount < amount) {
@@ -94,6 +103,39 @@ const requestBlood = async (req, res) => {
   }
 };
 
+// Функция для запроса крови в чрезвычайной ситуации
+const requestBloodEmergency = async (req, res) => {
+  try {
+    const { amount } = req.body;
+    console.log(`Requesting ${amount} units of blood type O- in emergency`);
+
+    const inventory = await BloodInventory.findOne({
+      where: { bloodType: "O-" },
+    });
+
+    if (!inventory || inventory.amount < amount) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Requested blood type O- not available in the required amount",
+        });
+    }
+
+    inventory.amount -= amount;
+    await inventory.save();
+    console.log(
+      `Blood requested successfully in emergency. New quantity: ${inventory.amount}`
+    );
+    res
+      .status(200)
+      .json({ message: "Blood requested successfully in emergency" });
+  } catch (error) {
+    console.error("Error requesting blood in emergency:", error);
+    res.status(500).json({ message: "Failed to request blood in emergency" });
+  }
+};
+
 // Функция для получения инвентаря крови
 const getBloodInventory = async (req, res) => {
   try {
@@ -109,4 +151,5 @@ module.exports = {
   addDonation,
   requestBlood,
   getBloodInventory,
+  requestBloodEmergency,
 };

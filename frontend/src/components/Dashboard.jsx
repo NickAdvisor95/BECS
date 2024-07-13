@@ -7,6 +7,8 @@ const Dashboard = () => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   const [showAddDonationForm, setShowAddDonationForm] = useState(false);
   const [showRequestBloodForm, setShowRequestBloodForm] = useState(false);
+  const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
+    useState(false); // Новый стейт для формы запроса крови в чрезвычайной ситуации
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [username, setUsername] = useState("");
@@ -106,6 +108,28 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Failed to request blood:", error);
       alert("Failed to request blood");
+    }
+  };
+
+  const handleRequestBloodEmergency = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await bloodService.requestBloodEmergency({
+        amount,
+      });
+      console.log("Response:", response);
+
+      if (response.message === "Blood requested successfully in emergency") {
+        alert("Blood requested successfully in emergency!");
+      } else {
+        alert(response.message || "Unknown error");
+      }
+
+      setShowRequestBloodEmergencyForm(false);
+      setAmount(0);
+    } catch (error) {
+      console.error("Failed to request blood in emergency:", error);
+      alert("Failed to request blood in emergency");
     }
   };
 
@@ -244,6 +268,28 @@ const Dashboard = () => {
             required
           />
           <button type="submit">Request Blood</button>
+        </form>
+      )}
+
+      <button
+        onClick={() =>
+          setShowRequestBloodEmergencyForm(!showRequestBloodEmergencyForm)
+        }
+      >
+        {showRequestBloodEmergencyForm
+          ? "Close Form"
+          : "Request Blood Emergency"}
+      </button>
+      {showRequestBloodEmergencyForm && (
+        <form onSubmit={handleRequestBloodEmergency}>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Amount"
+            required
+          />
+          <button type="submit">Request Blood Emergency</button>
         </form>
       )}
     </div>
