@@ -3,6 +3,8 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/";
 
 const login = async (username, password) => {
+  //send http request using axios.post. post is method in lybrary of axios that send http post request.
+  //1-st parameter is the url to which we send request . 2-nd object with username and password that user entered
   const response = await axios.post(API_URL + "login", { username, password });
   return response.data;
 };

@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "BloodInventory",
-      tableName: "blood_inventory", // Убедитесь, что имя таблицы указано правильно
+      tableName: "blood_inventory", 
     }
   );
   return BloodInventory;

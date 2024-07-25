@@ -1,10 +1,11 @@
-import React from "react";
+//for routing in our application
 import {
   BrowserRouter as Router,
-  Route,
+  Route, //component that compares url with component for this url
   Routes,
-  Navigate,
+  Navigate, //for redirection from one route to other
 } from "react-router-dom";
+//import components that will be displayed
 import Login from "./components/Login";
 import ChangePassword from "./components/ChangePassword";
 import Dashboard from "./components/Dashboard";

@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userService from "../services/userService";
 import bloodService from "../services/bloodService";
-import "./Dashboard.css"; // Подключаем наш CSS файл
+import "./Dashboard.css"; // css
 
 const Dashboard = () => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   const [showAddDonationForm, setShowAddDonationForm] = useState(false);
   const [showRequestBloodForm, setShowRequestBloodForm] = useState(false);
   const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
-    useState(false); // Новый стейт для формы запроса крови в чрезвычайной ситуации
+    useState(false); 
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [username, setUsername] = useState("");
@@ -30,15 +30,15 @@ const Dashboard = () => {
   const [requestBloodType, setRequestBloodType] = useState("");
   const [amount, setAmount] = useState(0);
   const [requestBloodTypeEmergency, setRequestBloodTypeEmergency] =
-    useState(""); // Поле для типа крови в чрезвычайной ситуации
-  const [amountEmergency, setAmountEmergency] = useState(0); // Поле для количества в чрезвычайной ситуации
+    useState(""); 
+  const [amountEmergency, setAmountEmergency] = useState(0); 
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Проверка наличия токена и роли пользователя (админ или нет)
+    // check token and role of user
     setIsAdmin(token && token.includes("admin"));
   }, []);
 

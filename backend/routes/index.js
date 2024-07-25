@@ -17,6 +17,6 @@ router.post("/add-user", authenticate, isAdmin, addUser);
 router.post("/add-donation", authenticate, addDonation);
 router.get("/blood-inventory", authenticate, getBloodInventory);
 router.post("/request-blood", authenticate, requestBlood);
-router.post("/request-blood-emergency", authenticate, requestBloodEmergency); // Новый маршрут
+router.post("/request-blood-emergency", authenticate, requestBloodEmergency);
 
 module.exports = router;

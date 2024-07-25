@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const password = "admin"; // Новый пароль в чистом виде
-    const hashedPassword = await bcrypt.hash(password, 10); // Хэшируем пароль перед вставкой
+    const password = "admin"; // hardcoded password before hashing
+    const hashedPassword = await bcrypt.hash(password, 10); // after hashing
 
     return queryInterface.bulkInsert(
       "Users",

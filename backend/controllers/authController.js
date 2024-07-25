@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { User, AuditLog } = require("../models");
 
 const login = async (req, res) => {
   try {
@@ -15,6 +15,13 @@ const login = async (req, res) => {
       "your_jwt_secret"
     );
     console.log("Login successful. User object:", user.toJSON());
+
+    // log record
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `User ${username} logged in`,
+    });
+
     res.json({ token, mustChangePassword: user.mustChangePassword });
   } catch (error) {
     console.error("Error during login:", error);
@@ -38,6 +45,12 @@ const changePassword = async (req, res) => {
     await user.update({
       password_hash: hashedPassword,
       mustChangePassword: false,
+    });
+
+    // record log of change password
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `User ${user.username} changed password`,
     });
 
     res.status(200).json({ message: "Password changed successfully" });

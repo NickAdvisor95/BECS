@@ -1,6 +1,11 @@
-const { BloodDonation, BloodInventory, BloodType } = require("../models");
+const {
+  BloodDonation,
+  BloodInventory,
+  BloodType,
+  AuditLog,
+} = require("../models");
 
-// Функция для поиска альтернативных типов крови
+// function for search alternative blood types
 const findAlternativeBloodTypes = async (bloodType) => {
   const bloodTypeRecord = await BloodType.findOne({ where: { bloodType } });
   if (bloodTypeRecord) {
@@ -9,7 +14,7 @@ const findAlternativeBloodTypes = async (bloodType) => {
   return [];
 };
 
-// Функция для добавления донации крови
+// function for input donation
 const addDonation = async (req, res) => {
   try {
     const {
@@ -31,7 +36,7 @@ const addDonation = async (req, res) => {
       isUsed: false,
     });
 
-    // Обновление таблицы blood_inventory
+    // when we add donation we need update table in bd blood_inventory
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
     if (inventory) {
       inventory.amount += 1;
@@ -40,6 +45,12 @@ const addDonation = async (req, res) => {
       await BloodInventory.create({ bloodType, amount: 1 });
     }
 
+    // Log the operation
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `Added donation: ${donorFirstName} ${donorLastName} donated ${donation_type} of blood type ${bloodType}`,
+    });
+
     res.status(201).json(newDonation);
   } catch (error) {
     console.error("Error adding donation:", error);
@@ -47,7 +58,7 @@ const addDonation = async (req, res) => {
   }
 };
 
-// Функция для запроса крови с учетом альтернатив и редкости
+// function that active when user click on request blood. Work accordance with alternatives and prevalence
 const requestBlood = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
@@ -68,6 +79,12 @@ const requestBlood = async (req, res) => {
             where: { bloodType: altType },
           });
           if (altInventory && altInventory.amount >= amount) {
+            // Log the operation
+            await AuditLog.create({
+              timestamp: new Date(),
+              operation: `Requested blood type ${bloodType} not available. Suggested alternative: ${altType}`,
+            });
+
             return res.status(200).json({
               message: "Requested blood type not available",
               alternatives: [altType],
@@ -75,6 +92,12 @@ const requestBlood = async (req, res) => {
           }
         }
       }
+
+      // Log the operation
+      await AuditLog.create({
+        timestamp: new Date(),
+        operation: `Requested blood type ${bloodType} not available and no suitable alternatives`,
+      });
 
       return res.status(200).json({
         message:
@@ -91,6 +114,13 @@ const requestBlood = async (req, res) => {
 
     inventory.amount -= amount;
     await inventory.save();
+
+    // Log the operation
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `Requested ${amount} units of blood type ${bloodType}`,
+    });
+
     console.log(
       `Blood requested successfully. New quantity: ${inventory.amount}`
     );
@@ -101,7 +131,7 @@ const requestBlood = async (req, res) => {
   }
 };
 
-// Функция для запроса крови в чрезвычайной ситуации
+// function for request blood emergency
 const requestBloodEmergency = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
@@ -115,6 +145,13 @@ const requestBloodEmergency = async (req, res) => {
       console.log(
         "No inventory found for this blood type or not enough blood in inventory"
       );
+
+      // Log the operation
+      await AuditLog.create({
+        timestamp: new Date(),
+        operation: `Requested blood type ${bloodType} not available in emergency`,
+      });
+
       return res.status(200).json({
         message:
           "Requested blood type not available and no suitable alternatives in emergency",
@@ -123,6 +160,13 @@ const requestBloodEmergency = async (req, res) => {
 
     inventory.amount -= amount;
     await inventory.save();
+
+    // Log the operation
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `Requested ${amount} units of blood type ${bloodType} in emergency`,
+    });
+
     console.log(
       `Blood requested successfully in emergency. New quantity: ${inventory.amount}`
     );
@@ -135,7 +179,7 @@ const requestBloodEmergency = async (req, res) => {
   }
 };
 
-// Функция для получения инвентаря крови
+// function for get blood inventory
 const getBloodInventory = async (req, res) => {
   try {
     const inventory = await BloodInventory.findAll();
