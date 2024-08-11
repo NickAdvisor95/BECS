@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [showAddDonationForm, setShowAddDonationForm] = useState(false);
   const [showRequestBloodForm, setShowRequestBloodForm] = useState(false);
   const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
-    useState(false); 
+    useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [username, setUsername] = useState("");
@@ -30,16 +30,17 @@ const Dashboard = () => {
   const [requestBloodType, setRequestBloodType] = useState("");
   const [amount, setAmount] = useState(0);
   const [requestBloodTypeEmergency, setRequestBloodTypeEmergency] =
-    useState(""); 
-  const [amountEmergency, setAmountEmergency] = useState(0); 
+    useState("");
+  const [amountEmergency, setAmountEmergency] = useState(0);
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // check token and role of user
-    setIsAdmin(token && token.includes("admin"));
+    const role = localStorage.getItem("role"); // Добавьте это
+    console.log("Role from localStorage:", role); // Вывод роли
+    setIsAdmin(role === "admin"); // Убедитесь, что проверка корректная
   }, []);
 
   const handleAddUser = async (e) => {
@@ -155,6 +156,21 @@ const Dashboard = () => {
     }
   };
 
+  const handleDownloadLogs = async () => {
+    try {
+      const response = await bloodService.downloadLogs();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "audit_logs.pdf");
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Failed to download logs:", error);
+      alert("Failed to download logs");
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <h1>Welcome to the Dashboard</h1>
@@ -185,6 +201,8 @@ const Dashboard = () => {
             ? "Close Form"
             : "Request Blood Emergency"}
         </button>
+
+        {isAdmin && <button onClick={handleDownloadLogs}>Download Logs</button>}
       </div>
 
       {showAddUserForm && (

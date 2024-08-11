@@ -3,7 +3,11 @@ const {
   BloodInventory,
   BloodType,
   AuditLog,
+  User, // Добавляем модель User для поиска пользователя
 } = require("../models");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const jwt = require("jsonwebtoken"); // Добавляем для декодирования JWT
 
 // function for search alternative blood types
 const findAlternativeBloodTypes = async (bloodType) => {
@@ -26,6 +30,12 @@ const addDonation = async (req, res) => {
       donation_type,
     } = req.body;
 
+    // Извлечение пользователя из токена
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    const userId = decoded.userId;
+    const user = await User.findByPk(userId);
+
     const newDonation = await BloodDonation.create({
       bloodType,
       donationDate,
@@ -36,7 +46,7 @@ const addDonation = async (req, res) => {
       isUsed: false,
     });
 
-    // when we add donation we need update table in bd blood_inventory
+    // Обновление таблицы blood_inventory
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
     if (inventory) {
       inventory.amount += 1;
@@ -45,10 +55,10 @@ const addDonation = async (req, res) => {
       await BloodInventory.create({ bloodType, amount: 1 });
     }
 
-    // Log the operation
+    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
-      operation: `Added donation: ${donorFirstName} ${donorLastName} donated ${donation_type} of blood type ${bloodType}`,
+      operation: `Added donation: ${donorFirstName} ${donorLastName} donated ${donation_type} of blood type ${bloodType} by user ${user.username}`,
     });
 
     res.status(201).json(newDonation);
@@ -62,6 +72,13 @@ const addDonation = async (req, res) => {
 const requestBlood = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
+
+    // Извлечение пользователя из токена
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    const userId = decoded.userId;
+    const user = await User.findByPk(userId);
+
     console.log(`Requesting ${amount} units of blood type ${bloodType}`);
 
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
@@ -79,10 +96,10 @@ const requestBlood = async (req, res) => {
             where: { bloodType: altType },
           });
           if (altInventory && altInventory.amount >= amount) {
-            // Log the operation
+            // Логирование операции с добавлением информации о пользователе
             await AuditLog.create({
               timestamp: new Date(),
-              operation: `Requested blood type ${bloodType} not available. Suggested alternative: ${altType}`,
+              operation: `Requested blood type ${bloodType} not available. Suggested alternative: ${altType} by user ${user.username}`,
             });
 
             return res.status(200).json({
@@ -93,10 +110,10 @@ const requestBlood = async (req, res) => {
         }
       }
 
-      // Log the operation
+      // Логирование операции с добавлением информации о пользователе
       await AuditLog.create({
         timestamp: new Date(),
-        operation: `Requested blood type ${bloodType} not available and no suitable alternatives`,
+        operation: `Requested blood type ${bloodType} not available and no suitable alternatives by user ${user.username}`,
       });
 
       return res.status(200).json({
@@ -115,10 +132,10 @@ const requestBlood = async (req, res) => {
     inventory.amount -= amount;
     await inventory.save();
 
-    // Log the operation
+    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
-      operation: `Requested ${amount} units of blood type ${bloodType}`,
+      operation: `Requested ${amount} units of blood type ${bloodType} by user ${user.username}`,
     });
 
     console.log(
@@ -135,6 +152,13 @@ const requestBlood = async (req, res) => {
 const requestBloodEmergency = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
+
+    // Извлечение пользователя из токена
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    const userId = decoded.userId;
+    const user = await User.findByPk(userId);
+
     console.log(
       `Requesting ${amount} units of blood type ${bloodType} in emergency`
     );
@@ -146,10 +170,10 @@ const requestBloodEmergency = async (req, res) => {
         "No inventory found for this blood type or not enough blood in inventory"
       );
 
-      // Log the operation
+      // Логирование операции с добавлением информации о пользователе
       await AuditLog.create({
         timestamp: new Date(),
-        operation: `Requested blood type ${bloodType} not available in emergency`,
+        operation: `Requested blood type ${bloodType} not available in emergency by user ${user.username}`,
       });
 
       return res.status(200).json({
@@ -161,10 +185,10 @@ const requestBloodEmergency = async (req, res) => {
     inventory.amount -= amount;
     await inventory.save();
 
-    // Log the operation
+    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
-      operation: `Requested ${amount} units of blood type ${bloodType} in emergency`,
+      operation: `Requested ${amount} units of blood type ${bloodType} in emergency by user ${user.username}`,
     });
 
     console.log(
@@ -190,9 +214,52 @@ const getBloodInventory = async (req, res) => {
   }
 };
 
+const downloadLogs = async (req, res) => {
+  try {
+    const logs = await AuditLog.findAll();
+    const doc = new PDFDocument();
+    let buffers = [];
+
+    doc.on("data", buffers.push.bind(buffers));
+    doc.on("end", () => {
+      let pdfData = Buffer.concat(buffers);
+      res
+        .writeHead(200, {
+          "Content-Length": Buffer.byteLength(pdfData),
+          "Content-Type": "application/pdf",
+          "Content-disposition": "attachment;filename=audit_logs.pdf",
+        })
+        .end(pdfData);
+    });
+
+    doc.fontSize(18).text("Audit Logs", { align: "center" });
+    doc.moveDown();
+
+    logs.forEach((log, index) => {
+      const timestamp = log.timestamp
+        ? log.timestamp.toISOString()
+        : "Unknown time";
+      const operation = log.operation || "Unknown operation";
+
+      doc
+        .fontSize(12)
+        .text(`${index + 1}. ${timestamp}: ${operation}`, {
+          align: "left",
+        })
+        .moveDown();
+    });
+
+    doc.end();
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).json({ message: "Failed to generate PDF" });
+  }
+};
+
 module.exports = {
   addDonation,
   requestBlood,
   requestBloodEmergency,
   getBloodInventory,
+  downloadLogs,
 };
