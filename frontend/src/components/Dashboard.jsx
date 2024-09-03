@@ -11,6 +11,8 @@ const Dashboard = () => {
   const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
     useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isResearchStudent, setIsResearchStudent] = useState(false);
+  const [bloodInventory, setBloodInventory] = useState([]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -38,10 +40,24 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role"); // Добавьте это
-    console.log("Role from localStorage:", role); // Вывод роли
-    setIsAdmin(role === "admin"); // Убедитесь, что проверка корректная
+    const role = localStorage.getItem("role");
+    console.log("Role from localStorage:", role);
+    setIsAdmin(role === "admin");
+    setIsResearchStudent(role === "research_student");
+
+    if (role === "research_student") {
+      fetchBloodInventory();
+    }
   }, []);
+
+  const fetchBloodInventory = async () => {
+    try {
+      const response = await bloodService.getBloodInventory();
+      setBloodInventory(response);
+    } catch (error) {
+      console.error("Failed to fetch blood inventory:", error);
+    }
+  };
 
   const handleAddUser = async (e) => {
     e.preventDefault();
@@ -175,35 +191,62 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <h1>Welcome to the Dashboard</h1>
 
-      <div className="dashboard-buttons">
-        {isAdmin && (
-          <>
-            <button onClick={() => setShowAddUserForm(!showAddUserForm)}>
-              {showAddUserForm ? "Close Form" : "Add User"}
-            </button>
-          </>
-        )}
+      {isResearchStudent ? (
+        <div>
+          <h2>Blood Inventory for Research</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Blood Type</th>
+                <th>Donation Date</th>
+                <th>Donation Type</th>
+                <th>Available Units</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bloodInventory.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.bloodType}</td>
+                  <td>{new Date(item.donationDate).toLocaleDateString()}</td>
+                  <td>{item.donation_type}</td>
+                  <td>{item.amount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="dashboard-buttons">
+          {isAdmin && (
+            <>
+              <button onClick={() => setShowAddUserForm(!showAddUserForm)}>
+                {showAddUserForm ? "Close Form" : "Add User"}
+              </button>
+              <button onClick={handleDownloadLogs}>Download Logs</button>
+            </>
+          )}
 
-        <button onClick={() => setShowAddDonationForm(!showAddDonationForm)}>
-          {showAddDonationForm ? "Close Form" : "Add Donation"}
-        </button>
+          <button onClick={() => setShowAddDonationForm(!showAddDonationForm)}>
+            {showAddDonationForm ? "Close Form" : "Add Donation"}
+          </button>
 
-        <button onClick={() => setShowRequestBloodForm(!showRequestBloodForm)}>
-          {showRequestBloodForm ? "Close Form" : "Request Blood"}
-        </button>
+          <button
+            onClick={() => setShowRequestBloodForm(!showRequestBloodForm)}
+          >
+            {showRequestBloodForm ? "Close Form" : "Request Blood"}
+          </button>
 
-        <button
-          onClick={() =>
-            setShowRequestBloodEmergencyForm(!showRequestBloodEmergencyForm)
-          }
-        >
-          {showRequestBloodEmergencyForm
-            ? "Close Form"
-            : "Request Blood Emergency"}
-        </button>
-
-        {isAdmin && <button onClick={handleDownloadLogs}>Download Logs</button>}
-      </div>
+          <button
+            onClick={() =>
+              setShowRequestBloodEmergencyForm(!showRequestBloodEmergencyForm)
+            }
+          >
+            {showRequestBloodEmergencyForm
+              ? "Close Form"
+              : "Request Blood Emergency"}
+          </button>
+        </div>
+      )}
 
       {showAddUserForm && (
         <form onSubmit={handleAddUser}>

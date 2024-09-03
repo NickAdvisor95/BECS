@@ -61,10 +61,21 @@ const downloadLogs = async () => {
   return response;
 };
 
+const getBloodInventory = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(API_URL + "blood-inventory", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export default {
   addDonation,
   useDonation,
   requestBlood,
   requestBloodEmergency,
-  downloadLogs, // Экспортируем новую функцию
+  downloadLogs,
+  getBloodInventory,
 };

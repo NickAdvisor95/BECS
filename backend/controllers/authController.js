@@ -11,7 +11,14 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id, role: user.isAdmin ? "admin" : "user" },
+      {
+        userId: user.id,
+        role: user.isAdmin
+          ? "admin"
+          : user.isResearchStudent
+          ? "research_student"
+          : "user",
+      },
       "your_jwt_secret"
     );
     console.log("Login successful. User object:", user.toJSON());
