@@ -198,8 +198,7 @@ const Dashboard = () => {
             <thead>
               <tr>
                 <th>Blood Type</th>
-                <th>Donation Date</th>
-                <th>Donation Type</th>
+
                 <th>Available Units</th>
               </tr>
             </thead>
@@ -207,8 +206,7 @@ const Dashboard = () => {
               {bloodInventory.map((item, index) => (
                 <tr key={index}>
                   <td>{item.bloodType}</td>
-                  <td>{new Date(item.donationDate).toLocaleDateString()}</td>
-                  <td>{item.donation_type}</td>
+
                   <td>{item.amount}</td>
                 </tr>
               ))}
