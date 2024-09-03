@@ -69,3 +69,34 @@ button[type="submit"]:hover {
   cursor: pointer;
   color: #007bff;
 }
+
+/* Добавьте это в ваш файл Dashboard.css */
+.dashboard-container h2 {
+  margin-bottom: 20px;
+}
+
+.dashboard-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.dashboard-container table th,
+.dashboard-container table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.dashboard-container table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.dashboard-container table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.dashboard-container table tr:hover {
+  background-color: #f1f1f1;
+}
