@@ -3,11 +3,11 @@ const {
   BloodInventory,
   BloodType,
   AuditLog,
-  User, // Добавляем модель User для поиска пользователя
+  User,
 } = require("../models");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const jwt = require("jsonwebtoken"); // Добавляем для декодирования JWT
+const jwt = require("jsonwebtoken");
 
 // function for search alternative blood types
 const findAlternativeBloodTypes = async (bloodType) => {
@@ -30,7 +30,6 @@ const addDonation = async (req, res) => {
       donation_type,
     } = req.body;
 
-    // Извлечение пользователя из токена
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, "your_jwt_secret");
     const userId = decoded.userId;
@@ -46,7 +45,6 @@ const addDonation = async (req, res) => {
       isUsed: false,
     });
 
-    // Обновление таблицы blood_inventory
     const inventory = await BloodInventory.findOne({ where: { bloodType } });
     if (inventory) {
       inventory.amount += 1;
@@ -55,7 +53,6 @@ const addDonation = async (req, res) => {
       await BloodInventory.create({ bloodType, amount: 1 });
     }
 
-    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
       operation: `Added donation: ${donorFirstName} ${donorLastName} donated ${donation_type} of blood type ${bloodType} by user ${user.username}`,
@@ -73,7 +70,6 @@ const requestBlood = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
 
-    // Извлечение пользователя из токена
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, "your_jwt_secret");
     const userId = decoded.userId;
@@ -96,7 +92,6 @@ const requestBlood = async (req, res) => {
             where: { bloodType: altType },
           });
           if (altInventory && altInventory.amount >= amount) {
-            // Логирование операции с добавлением информации о пользователе
             await AuditLog.create({
               timestamp: new Date(),
               operation: `Requested blood type ${bloodType} not available. Suggested alternative: ${altType} by user ${user.username}`,
@@ -110,7 +105,6 @@ const requestBlood = async (req, res) => {
         }
       }
 
-      // Логирование операции с добавлением информации о пользователе
       await AuditLog.create({
         timestamp: new Date(),
         operation: `Requested blood type ${bloodType} not available and no suitable alternatives by user ${user.username}`,
@@ -132,7 +126,6 @@ const requestBlood = async (req, res) => {
     inventory.amount -= amount;
     await inventory.save();
 
-    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
       operation: `Requested ${amount} units of blood type ${bloodType} by user ${user.username}`,
@@ -153,7 +146,6 @@ const requestBloodEmergency = async (req, res) => {
   try {
     const { bloodType, amount } = req.body;
 
-    // Извлечение пользователя из токена
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, "your_jwt_secret");
     const userId = decoded.userId;
@@ -170,7 +162,6 @@ const requestBloodEmergency = async (req, res) => {
         "No inventory found for this blood type or not enough blood in inventory"
       );
 
-      // Логирование операции с добавлением информации о пользователе
       await AuditLog.create({
         timestamp: new Date(),
         operation: `Requested blood type ${bloodType} not available in emergency by user ${user.username}`,
@@ -185,7 +176,6 @@ const requestBloodEmergency = async (req, res) => {
     inventory.amount -= amount;
     await inventory.save();
 
-    // Логирование операции с добавлением информации о пользователе
     await AuditLog.create({
       timestamp: new Date(),
       operation: `Requested ${amount} units of blood type ${bloodType} in emergency by user ${user.username}`,

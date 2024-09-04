@@ -38,7 +38,7 @@ button:hover {
 form {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Добавлено для отступа между элементами формы */
+  gap: 10px;
 }
 
 input,
