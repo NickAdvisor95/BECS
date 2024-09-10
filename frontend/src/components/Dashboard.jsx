@@ -354,6 +354,64 @@ const Dashboard = () => {
         </form>
       )}
 
+      {showDonorRegistrationForm && (
+        <form onSubmit={handleAddDonation}>
+          <input
+            type="text"
+            value={donorFirstName}
+            onChange={(e) => setDonorFirstName(e.target.value)}
+            placeholder="First name"
+            required
+          />
+          <input
+            type="text"
+            value={donorLastName}
+            onChange={(e) => setDonorLastName(e.target.value)}
+            placeholder="Last name"
+            required
+          />
+          <input
+            type="date"
+            value={donationDate}
+            onChange={(e) => setDonationDate(e.target.value)}
+            placeholder="Donation Date"
+            required
+          />
+          <input
+            type="text"
+            value={donor_id}
+            onChange={(e) => setDonorId(e.target.value)}
+            placeholder="Donor ID"
+            required
+          />
+          <input
+            type="text"
+            value={donorFirstName}
+            onChange={(e) => setDonorFirstName(e.target.value)}
+            placeholder="Donor First Name"
+            required
+          />
+          <input
+            type="text"
+            value={donorLastName}
+            onChange={(e) => setDonorLastName(e.target.value)}
+            placeholder="Donor Last Name"
+            required
+          />
+          <label>
+            Donation Type:
+            <select
+              value={donation_type}
+              onChange={(e) => setDonationType(e.target.value)}
+            >
+              <option value="blood">Blood</option>
+              <option value="plasma">Plasma</option>
+            </select>
+          </label>
+          <button type="submit">Add Donation</button>
+        </form>
+      )}
+
       {showRequestBloodForm && (
         <form onSubmit={handleRequestBlood}>
           <input
