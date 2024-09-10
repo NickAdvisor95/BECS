@@ -7,6 +7,8 @@ import "./Dashboard.css"; // css
 const Dashboard = () => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   const [showAddDonationForm, setShowAddDonationForm] = useState(false);
+  const [showDonorRegistrationForm, setShowDonorRegistrationForm] =
+    useState(false);
   const [showRequestBloodForm, setShowRequestBloodForm] = useState(false);
   const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
     useState(false);
@@ -224,6 +226,13 @@ const Dashboard = () => {
             </>
           )}
 
+          <button
+            onClick={() =>
+              setShowDonorRegistrationForm(!showDonorRegistrationForm)
+            }
+          >
+            {showDonorRegistrationForm ? "X" : "Donor registration"}
+          </button>
           <button onClick={() => setShowAddDonationForm(!showAddDonationForm)}>
             {showAddDonationForm ? "Close Form" : "Add Donation"}
           </button>
