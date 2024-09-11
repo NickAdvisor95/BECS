@@ -16,7 +16,7 @@ h1 {
 .dashboard-buttons {
   display: flex;
   justify-content: center;
-  gap: 10px; /* Добавлено для отступа между кнопками */
+  gap: 10px;
   margin-bottom: 20px;
 }
 

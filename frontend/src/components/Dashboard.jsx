@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userService from "../services/userService";
 import bloodService from "../services/bloodService";
 import "./Dashboard.css"; // css
+import Select from "react-select";
 
 const Dashboard = () => {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -26,6 +27,7 @@ const Dashboard = () => {
 
   const [bloodType, setBloodType] = useState("");
   const [donationDate, setDonationDate] = useState("");
+  const [birthdayDonor, setBirthdayDonor] = useState("");
   const [donor_id, setDonorId] = useState("");
   const [donorFirstName, setDonorFirstName] = useState("");
   const [donorLastName, setDonorLastName] = useState("");
@@ -39,6 +41,19 @@ const Dashboard = () => {
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
   const navigate = useNavigate();
+
+  const bloodTypeOptions = [
+    { value: "A+", label: "A+" },
+    { value: "O+", label: "O+" },
+    { value: "B+", label: "B+" },
+    { value: "AB+", label: "AB+" },
+    { value: "A-", label: "A-" },
+    { value: "O-", label: "O-" },
+    { value: "B-", label: "B-" },
+    { value: "AB-", label: "AB-" },
+  ];
+
+  const [medicalHistory, setMedicalHistory] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -371,44 +386,38 @@ const Dashboard = () => {
             required
           />
           <input
-            type="date"
-            value={donationDate}
-            onChange={(e) => setDonationDate(e.target.value)}
-            placeholder="Donation Date"
-            required
-          />
-          <input
             type="text"
             value={donor_id}
             onChange={(e) => setDonorId(e.target.value)}
-            placeholder="Donor ID"
+            placeholder="Passport ID"
+            required
+          />
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+              (option) => option.value === bloodType
+            )}
+            onChange={(selectedOption) => setBloodType(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
+            required
+          />
+          <label htmlFor="birthdayDonor">Birthday date</label>
+          <input
+            type="date"
+            value={birthdayDonor}
+            onChange={(e) => setBirthdayDonor(e.target.value)}
+            placeholder="Birthday date"
             required
           />
           <input
             type="text"
-            value={donorFirstName}
-            onChange={(e) => setDonorFirstName(e.target.value)}
-            placeholder="Donor First Name"
-            required
+            value={medicalHistory}
+            onChange={(e) => setMedicalHistory(e.target.value)}
+            placeholder="Medical history"
           />
-          <input
-            type="text"
-            value={donorLastName}
-            onChange={(e) => setDonorLastName(e.target.value)}
-            placeholder="Donor Last Name"
-            required
-          />
-          <label>
-            Donation Type:
-            <select
-              value={donation_type}
-              onChange={(e) => setDonationType(e.target.value)}
-            >
-              <option value="blood">Blood</option>
-              <option value="plasma">Plasma</option>
-            </select>
-          </label>
-          <button type="submit">Add Donation</button>
+
+          <button type="submit">Register donor</button>
         </form>
       )}
 
