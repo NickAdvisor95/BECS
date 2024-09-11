@@ -118,6 +118,30 @@ const Dashboard = () => {
     }
   };
 
+  const handleRegistrationDonor = async (e) => {
+    e.preventDefault();
+    try {
+      await bloodService.registrationDonation({
+        donorFirstName,
+        donorLastName,
+        donor_id,
+        bloodType,
+        birthdayDonor,
+        medicalHistory,
+      });
+      alert("The donor was registered  successfully!");
+      setShowDonorRegistrationForm(false);
+      setDonorFirstName("");
+      setDonorLastName("");
+      setDonorId("");
+      setBloodType("");
+      setBirthdayDonor("");
+      setMedicalHistory("");
+    } catch (error) {
+      alert("Failed to add donation");
+    }
+  };
+
   const handleRequestBlood = async (e) => {
     e.preventDefault();
     try {
@@ -370,7 +394,7 @@ const Dashboard = () => {
       )}
 
       {showDonorRegistrationForm && (
-        <form onSubmit={handleAddDonation}>
+        <form onSubmit={handleRegistrationDonor}>
           <input
             type="text"
             value={donorFirstName}

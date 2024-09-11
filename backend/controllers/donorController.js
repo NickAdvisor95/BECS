@@ -2,12 +2,12 @@ const { Donor } = require("../models"); // import model donor
 
 const addDonor = async (req, res) => {
   const {
-    firstName,
-    lastName,
-    passport_Id,
-    blood_type,
-    birth_date,
-    health_condition,
+    donorFirstName,
+    donorLastName,
+    donor_id,
+    bloodType,
+    birthdayDonor,
+    medicalHistory,
     insurance,
     email,
   } = req.body;
@@ -15,12 +15,12 @@ const addDonor = async (req, res) => {
   try {
     // create new donor
     const newDonor = await Donor.create({
-      firstName,
-      lastName,
-      passport_Id,
-      blood_type,
-      birth_date,
-      health_condition,
+      donorFirstName,
+      donorLastName,
+      donor_id,
+      bloodType,
+      birthdayDonor,
+      medicalHistory,
       insurance,
       email,
     });

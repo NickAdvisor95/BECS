@@ -11,6 +11,7 @@ const {
 const { authenticate, isAdmin } = require("../middleware/auth");
 
 const router = express.Router();
+const donorController = require("../controllers/donorController");
 
 router.post("/login", login);
 router.post("/change-password", authenticate, changePassword);
@@ -19,6 +20,7 @@ router.post("/add-donation", authenticate, addDonation);
 router.get("/blood-inventory", authenticate, getBloodInventory);
 router.post("/request-blood", authenticate, requestBlood);
 router.post("/request-blood-emergency", authenticate, requestBloodEmergency);
-router.get("/download-logs", authenticate, isAdmin, downloadLogs); // Новый маршрут
+router.get("/download-logs", authenticate, isAdmin, downloadLogs);
+router.post("/registration-donor", donorController.addDonor);
 
 module.exports = router;

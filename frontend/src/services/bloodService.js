@@ -12,6 +12,20 @@ const addDonation = async (donationData) => {
   return response.data;
 };
 
+const registrationDonation = async (donationData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(
+    API_URL + "registration-donor",
+    donationData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 const useDonation = async (donationId) => {
   const token = localStorage.getItem("token");
   const response = await axios.post(
@@ -73,6 +87,7 @@ const getBloodInventory = async () => {
 
 export default {
   addDonation,
+  registrationDonation,
   useDonation,
   requestBlood,
   requestBloodEmergency,
