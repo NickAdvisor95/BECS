@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       blood_type: DataTypes.STRING,
       birth_date: DataTypes.DATE,
       last_donation_date: DataTypes.DATE,
-      health_condition: DataTypes.TEXT,
+      medicalHistory: DataTypes.TEXT,
       insurance: DataTypes.STRING,
       email: DataTypes.STRING,
     },
