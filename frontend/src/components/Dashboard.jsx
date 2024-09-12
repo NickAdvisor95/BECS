@@ -120,6 +120,15 @@ const Dashboard = () => {
 
   const handleRegistrationDonor = async (e) => {
     e.preventDefault();
+
+    //client-side validaton for donor_id
+    const donorIdPattern = /^[0-9]{9}$/; //regular expresiion for only 9 digits
+
+    if (!donorIdPattern.test(donor_id)) {
+      alert("The donor id must be exactly 9 digits");
+      return;
+    }
+
     try {
       await bloodService.registrationDonation({
         donorFirstName,
@@ -138,7 +147,13 @@ const Dashboard = () => {
       setBirthdayDonor("");
       setMedicalHistory("");
     } catch (error) {
-      alert("Failed to add donation");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message);
+      } else alert("Failed to register donor");
     }
   };
 
