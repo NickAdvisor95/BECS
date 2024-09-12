@@ -24,7 +24,7 @@ const Dashboard = () => {
   });
 
   const [bloodType, setBloodType] = useState("");
-  const [donationDate, setDonationDate] = useState("");
+  const [donationDate, setDonationDate] = useState(new Date().toISOString().split("T")[0]);
   const [donor_id, setDonorId] = useState("");
   const [donorFirstName, setDonorFirstName] = useState("");
   const [donorLastName, setDonorLastName] = useState("");
@@ -92,7 +92,6 @@ const Dashboard = () => {
       alert("Donation added successfully!");
       setActiveForm(null);
       setBloodType("");
-      setDonationDate("");
       setDonorId("");
       setDonorFirstName("");
       setDonorLastName("");
