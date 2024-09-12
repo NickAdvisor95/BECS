@@ -249,25 +249,63 @@ const Dashboard = () => {
       {activeForm === "addUser" && (
           <form onSubmit={handleAddUser}>
             <input
-              type="checkbox"
-              checked={role.isRegularUser}
-              onChange={(e) =>
-                setRole({ ...role, isRegularUser: e.target.checked })
-              }
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+                required
             />
-          </label>
-          <label>
-            Research Student:
             <input
-              type="checkbox"
-              checked={role.isResearchStudent}
-              onChange={(e) =>
-                setRole({ ...role, isResearchStudent: e.target.checked })
-              }
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
             />
-          </label>
-          <button type="submit">Create User</button>
-        </form>
+            <label>
+              Admin:
+              <input
+                  type="checkbox"
+                  checked={role.isAdmin}
+                  onChange={(e) =>
+                      setRole({
+                        isAdmin: e.target.checked,
+                        isRegularUser: false,
+                        isResearchStudent: false,
+                      })
+                  }
+              />
+            </label>
+            <label>
+              Regular User:
+              <input
+                  type="checkbox"
+                  checked={role.isRegularUser}
+                  onChange={(e) =>
+                      setRole({
+                        isAdmin: false,
+                        isRegularUser: e.target.checked,
+                        isResearchStudent: false,
+                      })
+                  }
+              />
+            </label>
+            <label>
+              Research Student:
+              <input
+                  type="checkbox"
+                  checked={role.isResearchStudent}
+                  onChange={(e) =>
+                      setRole({
+                        isAdmin: false,
+                        isRegularUser: false,
+                        isResearchStudent: e.target.checked,
+                      })
+                  }
+              />
+            </label>
+            <button type="submit">Create User</button>
+          </form>
       )}
 
       {activeForm === "addDonations" && (
