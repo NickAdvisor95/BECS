@@ -6,11 +6,6 @@ import "./Dashboard.css"; // css
 
 const Dashboard = () => {
   const [activeForm, setActiveForm] = useState(null);
-  const [showAddUserForm, setShowAddUserForm] = useState(false);
-  const [showAddDonationForm, setShowAddDonationForm] = useState(false);
-  const [showRequestBloodForm, setShowRequestBloodForm] = useState(false);
-  const [showRequestBloodEmergencyForm, setShowRequestBloodEmergencyForm] =
-    useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isResearchStudent, setIsResearchStudent] = useState(false);
   const [bloodInventory, setBloodInventory] = useState([]);
