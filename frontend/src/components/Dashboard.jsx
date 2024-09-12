@@ -31,10 +31,10 @@ const Dashboard = () => {
   const [donation_type, setDonationType] = useState("blood");
 
   const [requestBloodType, setRequestBloodType] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(1);
   const [requestBloodTypeEmergency, setRequestBloodTypeEmergency] =
     useState("");
-  const [amountEmergency, setAmountEmergency] = useState(0);
+  const [amountEmergency, setAmountEmergency] = useState(1);
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
   const navigate = useNavigate();
@@ -335,6 +335,7 @@ const Dashboard = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Amount"
+            min="1"
             required
           />
           <button type="submit">Request Blood</button>
@@ -355,6 +356,7 @@ const Dashboard = () => {
             value={amountEmergency}
             onChange={(e) => setAmountEmergency(e.target.value)}
             placeholder="Amount"
+            min="1"
             required
           />
           <button type="submit">Request Blood Emergency</button>
