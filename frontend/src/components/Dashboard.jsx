@@ -114,6 +114,7 @@ const Dashboard = () => {
       setDonorFirstName("");
       setDonorLastName("");
       setDonationType("blood");
+      setDonorFound(false);
     } catch (error) {
       alert("Failed to add donation");
     }
