@@ -63,11 +63,8 @@ button[type="submit"]:hover {
   background-color: #218838;
 }
 
-.close-form {
-  margin-bottom: 20px;
-  text-align: center;
-  cursor: pointer;
-  color: #007bff;
+button.close-form {
+  background-color: #B60000AA;
 }
 
 .dashboard-container h2 {
