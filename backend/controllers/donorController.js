@@ -1,5 +1,20 @@
 const { Donor } = require("../models"); // import model donor
 
+const getDonorById = async (req, res) => {
+  try {
+    const donor = await Donor.findOne({
+      where: { donor_id: req.params.donor_id },
+    });
+    if (!donor) {
+      return res.status(404).json({ message: "Donor not found" });
+    }
+    res.json(donor);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching donor" });
+  }
+};
+
 const addDonor = async (req, res) => {
   const {
     donorFirstName,
@@ -51,4 +66,5 @@ const addDonor = async (req, res) => {
 
 module.exports = {
   addDonor,
+  getDonorById,
 };

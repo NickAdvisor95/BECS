@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [donationDate, setDonationDate] = useState("");
   const [birthdayDonor, setBirthdayDonor] = useState("");
   const [donor_id, setDonorId] = useState("");
+  const [donorFound, setDonorFound] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [donorFirstName, setDonorFirstName] = useState("");
   const [donorLastName, setDonorLastName] = useState("");
   const [donation_type, setDonationType] = useState("blood");
@@ -105,6 +107,10 @@ const Dashboard = () => {
         donorLastName,
         donation_type,
       });
+
+      // update last_donation_date
+      await bloodService.updateLastDonationDate(donor_id);
+
       alert("Donation added successfully!");
       setShowAddDonationForm(false);
       setBloodType("");
@@ -115,6 +121,40 @@ const Dashboard = () => {
       setDonationType("blood");
     } catch (error) {
       alert("Failed to add donation");
+    }
+  };
+
+  // seatch if donor exist
+  const handleDonorSearch = async () => {
+    try {
+      const response = await bloodService.getDonorById(donor_id); // request on server for searching donor
+      const donor = response.data;
+
+      if (!donor) {
+        setErrorMessage("Donor not found. Please register.");
+        setDonorFound(false);
+      } else {
+        const lastDonationDate = new Date(donor.last_donation_date);
+        const currentDate = new Date();
+        const diffMonths =
+          (currentDate - lastDonationDate) / (1000 * 60 * 60 * 24 * 30);
+
+        if (donor.last_donation_date && diffMonths < 3) {
+          setErrorMessage(
+            "The donor cannot donate yet. 3 months haven't passed since the last donation."
+          );
+          setDonorFound(false);
+        } else {
+          setDonorFound(true); // all form of donor
+          setDonorFirstName(donor.donorFirstName);
+          setDonorLastName(donor.donorLastName);
+          setBloodType(donor.bloodType);
+          setErrorMessage(""); // clean errors
+        }
+      }
+    } catch (error) {
+      setErrorMessage("Error occurred while searching for the donor.");
+      setDonorFound(false);
     }
   };
 
@@ -358,21 +398,7 @@ const Dashboard = () => {
       )}
 
       {showAddDonationForm && (
-        <form onSubmit={handleAddDonation}>
-          <input
-            type="text"
-            value={bloodType}
-            onChange={(e) => setBloodType(e.target.value)}
-            placeholder="Blood Type"
-            required
-          />
-          <input
-            type="date"
-            value={donationDate}
-            onChange={(e) => setDonationDate(e.target.value)}
-            placeholder="Donation Date"
-            required
-          />
+        <form>
           <input
             type="text"
             value={donor_id}
@@ -380,31 +406,58 @@ const Dashboard = () => {
             placeholder="Donor ID"
             required
           />
-          <input
-            type="text"
-            value={donorFirstName}
-            onChange={(e) => setDonorFirstName(e.target.value)}
-            placeholder="Donor First Name"
-            required
-          />
-          <input
-            type="text"
-            value={donorLastName}
-            onChange={(e) => setDonorLastName(e.target.value)}
-            placeholder="Donor Last Name"
-            required
-          />
-          <label>
-            Donation Type:
-            <select
-              value={donation_type}
-              onChange={(e) => setDonationType(e.target.value)}
-            >
-              <option value="blood">Blood</option>
-              <option value="plasma">Plasma</option>
-            </select>
-          </label>
-          <button type="submit">Add Donation</button>
+          <button type="button" onClick={handleDonorSearch}>
+            Search
+          </button>
+          {errorMessage && (
+            <p className="error-message" style={{ color: "red" }}>
+              {errorMessage}
+            </p>
+          )}
+
+          {/* if donor was found */}
+          {donorFound && (
+            <>
+              <input
+                type="text"
+                value={donorFirstName}
+                readOnly
+                placeholder="Donor First Name"
+              />
+              <input
+                type="text"
+                value={donorLastName}
+                readOnly
+                placeholder="Donor Last Name"
+              />
+              <input
+                type="text"
+                value={bloodType}
+                readOnly
+                placeholder="Blood Type"
+              />
+              <input
+                type="date"
+                value={donationDate}
+                onChange={(e) => setDonationDate(e.target.value)}
+                placeholder="Donation Date"
+                required
+              />
+              <label>
+                Donation Type:
+                <select
+                  value={donation_type}
+                  onChange={(e) => setDonationType(e.target.value)}
+                >
+                  <option value="blood">Blood</option>
+                  <option value="plasma">Plasma</option>
+                </select>
+              </label>
+              <button type="submit" onClick={handleAddDonation}>
+                Add Donation
+              </button>
+            </>
+          )}
         </form>
       )}
 

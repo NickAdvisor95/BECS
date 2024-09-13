@@ -85,6 +85,29 @@ const getBloodInventory = async () => {
   return response.data;
 };
 
+const getDonorById = async (donor_id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_URL}donor/${donor_id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
+const updateLastDonationDate = async (donor_id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(
+    API_URL + `donors/${donor_id}/update-last-donation`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 export default {
   addDonation,
   registrationDonation,
@@ -93,4 +116,6 @@ export default {
   requestBloodEmergency,
   downloadLogs,
   getBloodInventory,
+  getDonorById,
+  updateLastDonationDate,
 };
