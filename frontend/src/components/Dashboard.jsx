@@ -541,11 +541,14 @@ const Dashboard = () => {
 
       {activeForm === "requestBlood" && (
         <form onSubmit={handleRequestBlood}>
-          <input
-            type="text"
-            value={requestBloodType}
-            onChange={(e) => setRequestBloodType(e.target.value)}
-            placeholder="Blood Type"
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+                (option) => option.value === requestBloodType
+            )}
+            onChange={(selectedOption) => setRequestBloodType(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
             required
           />
           <input
@@ -562,11 +565,14 @@ const Dashboard = () => {
 
       {activeForm === "requestBloodEmergency" && (
         <form onSubmit={handleRequestBloodEmergency}>
-          <input
-            type="text"
-            value={requestBloodTypeEmergency}
-            onChange={(e) => setRequestBloodTypeEmergency(e.target.value)}
-            placeholder="Blood Type"
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+                (option) => option.value === requestBloodTypeEmergency
+            )}
+            onChange={(selectedOption) => setRequestBloodTypeEmergency(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
             required
           />
           <input
