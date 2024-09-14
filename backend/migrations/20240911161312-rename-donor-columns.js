@@ -7,6 +7,7 @@ module.exports = {
     await queryInterface.renameColumn("Donors", "passport_Id", "donor_id");
     await queryInterface.renameColumn("Donors", "blood_type", "bloodType");
     await queryInterface.renameColumn("Donors", "birth_date", "birthdayDonor");
+    await queryInterface.renameColumn("Donors", "last_donationDate", "last_donation_date");
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -15,5 +16,6 @@ module.exports = {
     await queryInterface.renameColumn("Donors", "donor_id", "passport_Id");
     await queryInterface.renameColumn("Donors", "bloodType", "blood_type");
     await queryInterface.renameColumn("Donors", "birthdayDonor", "birth_date");
+    await queryInterface.renameColumn("Donors", "last_donation_date", "last_donationDate");
   },
 };
