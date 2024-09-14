@@ -43,14 +43,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const bloodTypeOptions = [
-    { value: "A+", label: "A+" },
-    { value: "O+", label: "O+" },
-    { value: "B+", label: "B+" },
-    { value: "AB+", label: "AB+" },
-    { value: "A-", label: "A-" },
     { value: "O-", label: "O-" },
+    { value: "O+", label: "O+" },
+    { value: "A-", label: "A-" },
+    { value: "A+", label: "A+" },
     { value: "B-", label: "B-" },
+    { value: "B+", label: "B+" },
     { value: "AB-", label: "AB-" },
+    { value: "AB+", label: "AB+" },
   ];
 
   useEffect(() => {
