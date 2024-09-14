@@ -12,6 +12,20 @@ const addDonation = async (donationData) => {
   return response.data;
 };
 
+const registrationDonation = async (donationData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(
+    API_URL + "registration-donor",
+    donationData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 const useDonation = async (donationId) => {
   const token = localStorage.getItem("token");
   const response = await axios.post(
@@ -71,11 +85,37 @@ const getBloodInventory = async () => {
   return response.data;
 };
 
+const getDonorById = async (donor_id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_URL}donor/${donor_id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
+const updateLastDonationDate = async (donor_id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(
+    API_URL + `donors/${donor_id}/update-last-donation`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 export default {
   addDonation,
+  registrationDonation,
   useDonation,
   requestBlood,
   requestBloodEmergency,
   downloadLogs,
   getBloodInventory,
+  getDonorById,
+  updateLastDonationDate,
 };

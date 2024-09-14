@@ -3,16 +3,16 @@ module.exports = (sequelize, DataTypes) => {
   const Donor = sequelize.define(
     "Donor",
     {
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      passport_Id: {
+      donorFirstName: DataTypes.STRING,
+      donorLastName: DataTypes.STRING,
+      donor_id: {
         type: DataTypes.STRING,
         unique: true,
       },
-      blood_type: DataTypes.STRING,
-      birth_date: DataTypes.DATE,
+      bloodType: DataTypes.STRING,
+      birthdayDonor: DataTypes.DATE,
       last_donation_date: DataTypes.DATE,
-      health_condition: DataTypes.TEXT,
+      medicalHistory: DataTypes.TEXT,
       insurance: DataTypes.STRING,
       email: DataTypes.STRING,
     },

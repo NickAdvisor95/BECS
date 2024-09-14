@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userService from "../services/userService";
 import bloodService from "../services/bloodService";
 import "./Dashboard.css"; // css
+import Select from "react-select";
 
 const Dashboard = () => {
   const [activeForm, setActiveForm] = useState(null);
@@ -19,8 +20,13 @@ const Dashboard = () => {
   });
 
   const [bloodType, setBloodType] = useState("");
-  const [donationDate, setDonationDate] = useState(new Date().toISOString().split("T")[0]);
+  const [donationDate, setDonationDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [birthdayDonor, setBirthdayDonor] = useState("");
   const [donor_id, setDonorId] = useState("");
+  const [donorFound, setDonorFound] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [donorFirstName, setDonorFirstName] = useState("");
   const [donorLastName, setDonorLastName] = useState("");
   const [donation_type, setDonationType] = useState("blood");
@@ -32,7 +38,20 @@ const Dashboard = () => {
   const [amountEmergency, setAmountEmergency] = useState(1);
   const [alternativeBloodTypes, setAlternativeBloodTypes] = useState([]);
 
+  const [medicalHistory, setMedicalHistory] = useState("");
+
   const navigate = useNavigate();
+
+  const bloodTypeOptions = [
+    { value: "O-", label: "O-" },
+    { value: "O+", label: "O+" },
+    { value: "A-", label: "A-" },
+    { value: "A+", label: "A+" },
+    { value: "B-", label: "B-" },
+    { value: "B+", label: "B+" },
+    { value: "AB-", label: "AB-" },
+    { value: "AB+", label: "AB+" },
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -84,6 +103,10 @@ const Dashboard = () => {
         donorLastName,
         donation_type,
       });
+
+      // update last_donation_date
+      await bloodService.updateLastDonationDate(donor_id);
+
       alert("Donation added successfully!");
       setActiveForm(null);
       setBloodType("");
@@ -91,8 +114,82 @@ const Dashboard = () => {
       setDonorFirstName("");
       setDonorLastName("");
       setDonationType("blood");
+      setDonorFound(false);
     } catch (error) {
       alert("Failed to add donation");
+    }
+  };
+
+  const handleDonorSearch = async () => {
+    try {
+      const response = await bloodService.getDonorById(donor_id);
+      const donor = response.data;
+
+      if (!donor) {
+        setErrorMessage("Donor not found. Please register.");
+        setDonorFound(false);
+      } else {
+        const lastDonationDate = new Date(donor.last_donation_date);
+        const currentDate = new Date();
+        const diffMonths =
+          (currentDate - lastDonationDate) / (1000 * 60 * 60 * 24 * 30);
+
+        if (donor.last_donation_date && diffMonths < 3) {
+          setErrorMessage(
+            "The donor cannot donate yet. 3 months haven't passed since the last donation."
+          );
+          setDonorFound(false);
+        } else {
+          setDonorFound(true);
+          setDonorFirstName(donor.donorFirstName);
+          setDonorLastName(donor.donorLastName);
+          setBloodType(donor.bloodType);
+          setErrorMessage("");
+        }
+      }
+    } catch (error) {
+      setErrorMessage("Error occurred while searching for the donor.");
+      setDonorFound(false);
+    }
+  };
+
+  const handleRegistrationDonor = async (e) => {
+    e.preventDefault();
+
+    const donorIdPattern = /^[0-9]{9}$/;
+
+    if (!donorIdPattern.test(donor_id)) {
+      alert("The donor id must be exactly 9 digits");
+      return;
+    }
+
+    try {
+      await bloodService.registrationDonation({
+        donorFirstName,
+        donorLastName,
+        donor_id,
+        bloodType,
+        birthdayDonor,
+        medicalHistory,
+      });
+      alert("The donor was registered successfully!");
+      setActiveForm(null);
+      setDonorFirstName("");
+      setDonorLastName("");
+      setDonorId("");
+      setBloodType("");
+      setBirthdayDonor("");
+      setMedicalHistory("");
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message);
+      } else {
+        alert("Failed to register donor");
+      }
     }
   };
 
@@ -103,7 +200,6 @@ const Dashboard = () => {
         bloodType: requestBloodType,
         amount,
       });
-      console.log("Response:", response);
 
       if (response.message === "Blood requested successfully") {
         alert("Blood requested successfully!");
@@ -119,10 +215,9 @@ const Dashboard = () => {
 
       setActiveForm(null);
       setRequestBloodType("");
-      setAmount(0);
+      setAmount(1);
       setAlternativeBloodTypes([]);
     } catch (error) {
-      console.error("Failed to request blood:", error);
       if (
         error.response &&
         error.response.data &&
@@ -142,7 +237,6 @@ const Dashboard = () => {
         bloodType: requestBloodTypeEmergency,
         amount: amountEmergency,
       });
-      console.log("Response:", response);
 
       if (response.message === "Blood requested successfully in emergency") {
         alert("Blood requested successfully in emergency!");
@@ -152,9 +246,8 @@ const Dashboard = () => {
 
       setActiveForm(null);
       setRequestBloodTypeEmergency("");
-      setAmountEmergency(0);
+      setAmountEmergency(1);
     } catch (error) {
-      console.error("Failed to request blood in emergency:", error);
       if (
         error.response &&
         error.response.data &&
@@ -177,7 +270,6 @@ const Dashboard = () => {
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      console.error("Failed to download logs:", error);
       alert("Failed to download logs");
     }
   };
@@ -193,7 +285,6 @@ const Dashboard = () => {
             <thead>
               <tr>
                 <th>Blood Type</th>
-
                 <th>Available Units</th>
               </tr>
             </thead>
@@ -201,7 +292,6 @@ const Dashboard = () => {
               {bloodInventory.map((item, index) => (
                 <tr key={index}>
                   <td>{item.bloodType}</td>
-
                   <td>{item.amount}</td>
                 </tr>
               ))}
@@ -209,158 +299,256 @@ const Dashboard = () => {
           </table>
         </div>
       ) : (
-          <div className="dashboard-buttons">
-            {isAdmin && (
-                <>
-                  <button onClick={() => setActiveForm(activeForm === "addUser" ? null : "addUser")}
-                          className={activeForm === "addUser" && "close-form"}>
-                    {activeForm === "addUser" ? "Close Form" : "Add User"}
-                  </button>
-                  <button onClick={handleDownloadLogs}>Download Logs</button>
-                </>
-            )}
+        <div className="dashboard-buttons">
+          {isAdmin && (
+            <>
+              <button
+                onClick={() =>
+                  setActiveForm(activeForm === "addUser" ? null : "addUser")
+                }
+                className={activeForm === "addUser" && "close-form"}
+              >
+                {activeForm === "addUser" ? "Close Form" : "Add User"}
+              </button>
+              <button onClick={handleDownloadLogs}>Download Logs</button>
+            </>
+          )}
 
-            <button onClick={() => setActiveForm(activeForm === "addDonations" ? null : "addDonations")}
-                    className={activeForm === "addDonations" && "close-form"}>
-              {activeForm === "addDonations" ? "Close Form" : "Add Donation"}
-            </button>
+          <button
+            onClick={() =>
+              setActiveForm(
+                activeForm === "registerDonor" ? null : "registerDonor"
+              )
+            }
+            className={activeForm === "registerDonor" && "close-form"}
+          >
+            {activeForm === "registerDonor"
+              ? "Close Form"
+              : "Donor Registration"}
+          </button>
 
-            <button
-                onClick={() => setActiveForm(activeForm === "requestBlood" ? null : "requestBlood")}
-                className={activeForm === "requestBlood" && "close-form"}
-            >
-              {activeForm === "requestBlood" ? "Close Form" : "Request Blood"}
-            </button>
+          <button
+            onClick={() =>
+              setActiveForm(
+                activeForm === "addDonations" ? null : "addDonations"
+              )
+            }
+            className={activeForm === "addDonations" && "close-form"}
+          >
+            {activeForm === "addDonations" ? "Close Form" : "Add Donation"}
+          </button>
 
-            <button
-                onClick={() => setActiveForm(activeForm === "requestBloodEmergency" ? null : "requestBloodEmergency")}
-                className={activeForm === "requestBloodEmergency" && "close-form"}
-            >
-              {activeForm === "requestBloodEmergency" ? "Close Form" : "Request Blood Emergency"}
-            </button>
-          </div>
+          <button
+            onClick={() =>
+              setActiveForm(
+                activeForm === "requestBlood" ? null : "requestBlood"
+              )
+            }
+            className={activeForm === "requestBlood" && "close-form"}
+          >
+            {activeForm === "requestBlood" ? "Close Form" : "Request Blood"}
+          </button>
+
+          <button
+            onClick={() =>
+              setActiveForm(
+                activeForm === "requestBloodEmergency"
+                  ? null
+                  : "requestBloodEmergency"
+              )
+            }
+            className={activeForm === "requestBloodEmergency" && "close-form"}
+          >
+            {activeForm === "requestBloodEmergency"
+              ? "Close Form"
+              : "Request Blood Emergency"}
+          </button>
+        </div>
       )}
 
       {activeForm === "addUser" && (
-          <form onSubmit={handleAddUser}>
+        <form onSubmit={handleAddUser}>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+          <label>
+            Admin:
             <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
+              type="checkbox"
+              checked={role.isAdmin}
+              onChange={(e) =>
+                setRole({
+                  isAdmin: e.target.checked,
+                  isRegularUser: false,
+                  isResearchStudent: false,
+                })
+              }
             />
+          </label>
+          <label>
+            Regular User:
             <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
+              type="checkbox"
+              checked={role.isRegularUser}
+              onChange={(e) =>
+                setRole({
+                  isAdmin: false,
+                  isRegularUser: e.target.checked,
+                  isResearchStudent: false,
+                })
+              }
             />
-            <label>
-              Admin:
-              <input
-                  type="checkbox"
-                  checked={role.isAdmin}
-                  onChange={(e) =>
-                      setRole({
-                        isAdmin: e.target.checked,
-                        isRegularUser: false,
-                        isResearchStudent: false,
-                      })
-                  }
-              />
-            </label>
-            <label>
-              Regular User:
-              <input
-                  type="checkbox"
-                  checked={role.isRegularUser}
-                  onChange={(e) =>
-                      setRole({
-                        isAdmin: false,
-                        isRegularUser: e.target.checked,
-                        isResearchStudent: false,
-                      })
-                  }
-              />
-            </label>
-            <label>
-              Research Student:
-              <input
-                  type="checkbox"
-                  checked={role.isResearchStudent}
-                  onChange={(e) =>
-                      setRole({
-                        isAdmin: false,
-                        isRegularUser: false,
-                        isResearchStudent: e.target.checked,
-                      })
-                  }
-              />
-            </label>
-            <button type="submit">Create User</button>
-          </form>
+          </label>
+          <label>
+            Research Student:
+            <input
+              type="checkbox"
+              checked={role.isResearchStudent}
+              onChange={(e) =>
+                setRole({
+                  isAdmin: false,
+                  isRegularUser: false,
+                  isResearchStudent: e.target.checked,
+                })
+              }
+            />
+          </label>
+          <button type="submit">Create User</button>
+        </form>
       )}
 
-      {activeForm === "addDonations" && (
-          <form onSubmit={handleAddDonation}>
-            <input
-                type="text"
-                value={bloodType}
-                onChange={(e) => setBloodType(e.target.value)}
-                placeholder="Blood Type"
-                required
-            />
-            <input
-                type="date"
-                value={donationDate}
-                onChange={(e) => setDonationDate(e.target.value)}
-                placeholder="Donation Date"
-                required
-            />
-            <input
-                type="text"
-                value={donor_id}
-                onChange={(e) => setDonorId(e.target.value)}
-                placeholder="Donor ID"
-                required
-            />
-            <input
-                type="text"
-                value={donorFirstName}
+      {activeForm === "registerDonor" && (
+        <form onSubmit={handleRegistrationDonor}>
+          <input
+            type="text"
+            value={donorFirstName}
             onChange={(e) => setDonorFirstName(e.target.value)}
-            placeholder="Donor First Name"
+            placeholder="First name"
             required
           />
           <input
             type="text"
             value={donorLastName}
             onChange={(e) => setDonorLastName(e.target.value)}
-            placeholder="Donor Last Name"
+            placeholder="Last name"
             required
           />
-          <label>
-            Donation Type:
-            <select
-              value={donation_type}
-              onChange={(e) => setDonationType(e.target.value)}
-            >
-              <option value="blood">Blood</option>
-              <option value="plasma">Plasma</option>
-            </select>
-          </label>
-          <button type="submit">Add Donation</button>
+          <input
+            type="text"
+            value={donor_id}
+            onChange={(e) => setDonorId(e.target.value)}
+            placeholder="Passport ID"
+            required
+          />
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+              (option) => option.value === bloodType
+            )}
+            onChange={(selectedOption) => setBloodType(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
+            required
+          />
+          <label htmlFor="birthdayDonor">Birthday date</label>
+          <input
+            type="date"
+            value={birthdayDonor}
+            onChange={(e) => setBirthdayDonor(e.target.value)}
+            placeholder="Birthday date"
+            required
+          />
+          <input
+            type="text"
+            value={medicalHistory}
+            onChange={(e) => setMedicalHistory(e.target.value)}
+            placeholder="Medical history"
+          />
+          <button type="submit">Register Donor</button>
+        </form>
+      )}
+
+      {activeForm === "addDonations" && (
+        <form onSubmit={handleAddDonation}>
+          <input
+            type="text"
+            value={donor_id}
+            onChange={(e) => setDonorId(e.target.value)}
+            placeholder="Donor ID"
+            required
+          />
+          <button type="button" onClick={handleDonorSearch}>
+            Search
+          </button>
+          {errorMessage && (
+            <p className="error-message" style={{ color: "red" }}>
+              {errorMessage}
+            </p>
+          )}
+          {donorFound && (
+            <>
+              <input
+                type="text"
+                value={donorFirstName}
+                readOnly
+                placeholder="Donor First Name"
+              />
+              <input
+                type="text"
+                value={donorLastName}
+                readOnly
+                placeholder="Donor Last Name"
+              />
+              <input
+                type="text"
+                value={bloodType}
+                readOnly
+                placeholder="Blood Type"
+              />
+              <input
+                type="date"
+                value={donationDate}
+                onChange={(e) => setDonationDate(e.target.value)}
+                placeholder="Donation Date"
+                required
+              />
+              <label>
+                Donation Type:
+                <select
+                  value={donation_type}
+                  onChange={(e) => setDonationType(e.target.value)}
+                >
+                  <option value="blood">Blood</option>
+                  <option value="plasma">Plasma</option>
+                </select>
+              </label>
+              <button type="submit">Add Donation</button>
+            </>
+          )}
         </form>
       )}
 
       {activeForm === "requestBlood" && (
         <form onSubmit={handleRequestBlood}>
-          <input
-            type="text"
-            value={requestBloodType}
-            onChange={(e) => setRequestBloodType(e.target.value)}
-            placeholder="Blood Type"
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+                (option) => option.value === requestBloodType
+            )}
+            onChange={(selectedOption) => setRequestBloodType(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
             required
           />
           <input
@@ -377,11 +565,14 @@ const Dashboard = () => {
 
       {activeForm === "requestBloodEmergency" && (
         <form onSubmit={handleRequestBloodEmergency}>
-          <input
-            type="text"
-            value={requestBloodTypeEmergency}
-            onChange={(e) => setRequestBloodTypeEmergency(e.target.value)}
-            placeholder="Blood Type"
+          <Select
+            options={bloodTypeOptions}
+            value={bloodTypeOptions.find(
+                (option) => option.value === requestBloodTypeEmergency
+            )}
+            onChange={(selectedOption) => setRequestBloodTypeEmergency(selectedOption.value)}
+            placeholder="Select blood type"
+            isSearchable
             required
           />
           <input
