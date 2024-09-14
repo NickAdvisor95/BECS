@@ -306,7 +306,7 @@ const Dashboard = () => {
                 onClick={() =>
                   setActiveForm(activeForm === "addUser" ? null : "addUser")
                 }
-                className={activeForm === "addUser" ? "close-form" : ""}
+                className={activeForm === "addUser" && "close-form"}
               >
                 {activeForm === "addUser" ? "Close Form" : "Add User"}
               </button>
@@ -320,7 +320,7 @@ const Dashboard = () => {
                 activeForm === "registerDonor" ? null : "registerDonor"
               )
             }
-            className={activeForm === "registerDonor" ? "close-form" : ""}
+            className={activeForm === "registerDonor" && "close-form"}
           >
             {activeForm === "registerDonor"
               ? "Close Form"
@@ -333,7 +333,7 @@ const Dashboard = () => {
                 activeForm === "addDonations" ? null : "addDonations"
               )
             }
-            className={activeForm === "addDonations" ? "close-form" : ""}
+            className={activeForm === "addDonations" && "close-form"}
           >
             {activeForm === "addDonations" ? "Close Form" : "Add Donation"}
           </button>
@@ -344,7 +344,7 @@ const Dashboard = () => {
                 activeForm === "requestBlood" ? null : "requestBlood"
               )
             }
-            className={activeForm === "requestBlood" ? "close-form" : ""}
+            className={activeForm === "requestBlood" && "close-form"}
           >
             {activeForm === "requestBlood" ? "Close Form" : "Request Blood"}
           </button>
@@ -357,9 +357,7 @@ const Dashboard = () => {
                   : "requestBloodEmergency"
               )
             }
-            className={
-              activeForm === "requestBloodEmergency" ? "close-form" : ""
-            }
+            className={activeForm === "requestBloodEmergency" && "close-form"}
           >
             {activeForm === "requestBloodEmergency"
               ? "Close Form"
