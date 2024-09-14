@@ -215,7 +215,7 @@ const Dashboard = () => {
 
       setActiveForm(null);
       setRequestBloodType("");
-      setAmount(0);
+      setAmount(1);
       setAlternativeBloodTypes([]);
     } catch (error) {
       if (
@@ -246,7 +246,7 @@ const Dashboard = () => {
 
       setActiveForm(null);
       setRequestBloodTypeEmergency("");
-      setAmountEmergency(0);
+      setAmountEmergency(1);
     } catch (error) {
       if (
         error.response &&
