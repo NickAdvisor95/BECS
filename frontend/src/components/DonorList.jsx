@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import donorService from "../services/donorService";
 
 const DonorList = () => {
