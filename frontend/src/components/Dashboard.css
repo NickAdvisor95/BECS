@@ -35,6 +35,26 @@ button:hover {
   background-color: #0056b3;
 }
 
+button[type="submit"] {
+  background-color: #28a745;
+}
+
+button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+button.close-form {
+  background-color: #B60000AA;
+}
+
+#add-user,
+#donor-registration,
+#add-donation,
+#add-donation,
+#request-blood,
+#download-logs,
+#info-button {}
+
 form {
   display: flex;
   flex-direction: column;
@@ -53,18 +73,6 @@ label {
   display: flex;
   align-items: center;
   gap: 5px;
-}
-
-button[type="submit"] {
-  background-color: #28a745;
-}
-
-button[type="submit"]:hover {
-  background-color: #218838;
-}
-
-button.close-form {
-  background-color: #B60000AA;
 }
 
 .dashboard-container h2 {
