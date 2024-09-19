@@ -321,6 +321,10 @@ const Dashboard = () => {
       content: "Need a blood from an inventory? Just request one! Choose the blood type you need and take it if exists. Otherwise take an alternative.",
     },
     {
+      target: "#request-blood-er",
+      content: "You are free to request amount of blood for your emergency!",
+    },
+    {
       target: "#download-logs",
       content: "Here you can download audit logs for actions made here. The document will be in pdf format.",
     },
@@ -446,7 +450,7 @@ const Dashboard = () => {
                 {activeForm === "requestBlood" ? "Close Form" : "Request Blood"}
               </button>
 
-              <button
+              <button id="request-blood-er"
                   onClick={() =>
                       setActiveForm(
                           activeForm === "requestBloodEmergency"
