@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import authService from "../services/authService"; //functions for work with authentification
 import { useNavigate } from "react-router-dom"; //for navigation between pages
 
@@ -6,6 +6,13 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); //function for moving to other pages
+  const firstInputRef = useRef(null);
+
+  useEffect(() => {
+    if (firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, []);
 
   //this function called when the form is sending
   const handleSubmit = async (e) => {
@@ -36,12 +43,15 @@ const Login = () => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
+        ref={firstInputRef}
+        required
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
+        required
       />
       <button type="submit">Login</button>
     </form>
