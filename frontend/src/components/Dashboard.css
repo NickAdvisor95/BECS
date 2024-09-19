@@ -54,7 +54,8 @@ button.close-form {
 #request-blood,
 #request-blood-er,
 #download-logs,
-#info-button {}
+#info-button,
+#blood-inventory {}
 
 form {
   display: flex;

@@ -330,10 +330,25 @@ const Dashboard = () => {
     },
   ]);
 
+  const stepsForStudent = [
+    {
+      target: "h1",
+      content: "Welcome! Please spare a minute to learn about the functionality. You can skip the tutorial at any time.",
+    },
+    {
+      target: "#info-button",
+      content: "If you want to see the tutorial again, you can click here or at the green point if you see one!"
+    },
+    {
+      target: "#blood-inventory",
+      content: "Here in the table you can find our blood inventory. Research it in your time!"
+    },
+  ];
+
   return (
       <div className="dashboard-container">
         <Joyride
-            steps={steps}
+            steps={isResearchStudent ? stepsForStudent : steps}
             continuous={true}
             showProgress={true}
             showSkipButton={true}
@@ -383,7 +398,7 @@ const Dashboard = () => {
         {isResearchStudent ? (
             <div>
               <h2>Blood Inventory for Research</h2>
-              <table>
+              <table id="blood-inventory">
                 <thead>
                 <tr>
                   <th>Blood Type</th>
