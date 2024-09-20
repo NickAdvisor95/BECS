@@ -23,7 +23,7 @@ const App = () => {
   return (
       <>
           <nav>
-              {location.pathname !== "/login" && (
+              {!['/login', '/change-password'].includes(location.pathname) && (
                   <button
                       style={{backgroundColor: "#28a745"}}
                       onClick={handleLogout}>Logout</button>

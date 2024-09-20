@@ -2,7 +2,7 @@ const BloodInventory = ({ title, bloodInventory }) => {
     return (
         <div>
             <h2 style={{ textAlign: 'center' }}>{title}</h2> {/* Use the title prop for the h2 element */}
-            <table id="blood-inventory">
+            <table id="blood-inventory" className="std">
                 <thead>
                 <tr>
                     <th>Blood Type</th>
