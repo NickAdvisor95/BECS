@@ -22,7 +22,24 @@ const changePassword = async (newPassword) => {
   );
 };
 
+const logout = async () => {
+  const token = localStorage.getItem("token");
+  await axios.post(
+      API_URL + "logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+  );
+
+  // Remove token from local storage after successful logout
+  localStorage.removeItem("token");
+};
+
 export default {
   login,
   changePassword,
+  logout
 };

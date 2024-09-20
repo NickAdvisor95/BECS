@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, changePassword } = require("../controllers/authController");
+const { login, changePassword, logout } = require("../controllers/authController");
 const { addUser } = require("../controllers/userController");
 const {
   addDonation,
@@ -15,6 +15,7 @@ const donorController = require("../controllers/donorController");
 const { Donor } = require("../models");
 
 router.post("/login", login);
+router.post("/logout", logout);
 router.post("/change-password", authenticate, changePassword);
 router.post("/add-user", authenticate, isAdmin, addUser);
 router.post("/add-donation", authenticate, addDonation);
