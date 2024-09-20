@@ -6,6 +6,7 @@ import "./Dashboard.css"; // css
 import Select from "react-select";
 import Joyride from 'react-joyride';
 import infoIcon from '../assets/info.png';
+import BloodInventory from './BloodInventory';
 
 const Dashboard = () => {
   const [activeForm, setActiveForm] = useState(null);
@@ -64,9 +65,7 @@ const Dashboard = () => {
     setIsAdmin(role === "admin");
     setIsResearchStudent(role === "research_student");
 
-    if (role === "research_student") {
-      fetchBloodInventory();
-    }
+    fetchBloodInventory();
   }, []);
 
   useEffect(() => {
@@ -325,6 +324,10 @@ const Dashboard = () => {
       content: "You are free to request amount of blood for your emergency!",
     },
     {
+      target: "#blood-inventory",
+      content: "Here in the table you can find the blood inventory. Available blood types and their amount.",
+    },
+    {
       target: "#download-logs",
       content: "Here you can download audit logs for actions made here. The document will be in pdf format.",
     },
@@ -396,25 +399,7 @@ const Dashboard = () => {
         </div>
 
         {isResearchStudent ? (
-            <div>
-              <h2>Blood Inventory for Research</h2>
-              <table id="blood-inventory">
-                <thead>
-                <tr>
-                  <th>Blood Type</th>
-                  <th>Available Units</th>
-                </tr>
-                </thead>
-                <tbody>
-                {bloodInventory.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.bloodType}</td>
-                      <td>{item.amount}</td>
-                    </tr>
-                ))}
-                </tbody>
-              </table>
-            </div>
+            <BloodInventory title="Blood Inventory for Research" bloodInventory={bloodInventory} />
         ) : (
             <div className="dashboard-buttons">
               {isAdmin && (
@@ -466,19 +451,35 @@ const Dashboard = () => {
               </button>
 
               <button id="request-blood-er"
-                  onClick={() =>
-                      setActiveForm(
-                          activeForm === "requestBloodEmergency"
-                              ? null
-                              : "requestBloodEmergency"
-                      )
-                  }
-                  className={activeForm === "requestBloodEmergency" && "close-form"}
+                      onClick={() =>
+                          setActiveForm(
+                              activeForm === "requestBloodEmergency"
+                                  ? null
+                                  : "requestBloodEmergency"
+                          )
+                      }
+                      className={activeForm === "requestBloodEmergency" && "close-form"}
               >
                 {activeForm === "requestBloodEmergency"
                     ? "Close Form"
                     : "Request Blood Emergency"}
               </button>
+
+              <button id="blood-inventory"
+                      onClick={() =>
+                          setActiveForm(
+                              activeForm === "bloodInventory"
+                                  ? null
+                                  : "bloodInventory"
+                          )
+                      }
+                      className={activeForm === "bloodInventory" && "close-form"}
+              >
+                {activeForm === "bloodInventory"
+                    ? "Close Form"
+                    : "Show Blood Inventory"}
+              </button>
+
               <button id="download-logs"
                       onClick={handleDownloadLogs}>Download Logs
               </button>
@@ -704,6 +705,10 @@ const Dashboard = () => {
               />
               <button type="submit">Request Blood Emergency</button>
             </form>
+        )}
+
+        {activeForm === "bloodInventory" && (
+            <BloodInventory title="Blood Inventory" bloodInventory={bloodInventory} />
         )}
       </div>
   );
