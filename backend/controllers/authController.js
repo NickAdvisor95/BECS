@@ -67,7 +67,32 @@ const changePassword = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    const userId = decoded.userId;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+
+    // log record
+    await AuditLog.create({
+      timestamp: new Date(),
+      operation: `User ${user.username} logged out`,
+    });
+
+    res.status(200).json({message: "Logout successful"});
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({message: "Server error"});
+  }
+};
+
 module.exports = {
   login,
   changePassword,
+  logout
 };
