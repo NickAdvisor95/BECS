@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [activeForm, setActiveForm] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isResearchStudent, setIsResearchStudent] = useState(false);
+  const [isRegularUser, setIsRegularUser] = useState(false);
   const [bloodInventory, setBloodInventory] = useState([]);
 
   const [username, setUsername] = useState("");
@@ -64,6 +65,7 @@ const Dashboard = () => {
     console.log("Role from localStorage:", role);
     setIsAdmin(role === "admin");
     setIsResearchStudent(role === "research_student");
+    setIsRegularUser(role === "regular_user");
 
     fetchBloodInventory();
   }, []);
@@ -298,40 +300,58 @@ const Dashboard = () => {
     {
       target: "h1",
       content: "Welcome! Please spare a minute to learn about the functionality. You can skip the tutorial at any time.",
+      roles: ['admin', 'student', 'user']
     },
     {
       target: "#info-button",
-      content: "If you want to see the tutorial again, you can click here or at the green point if you see one!"
+      content: "If you want to see the tutorial again, you can click here or at the green point if you see one!",
+      roles: ['admin', 'student', 'user']
     },
     {
       target: "#add-user",
-      content: "Here you can register a new user! Once the name is entered, choose the user's role (Admin / Regular User / Research Student)."
+      content: "Here you can register a new user! Once the name is entered, choose the user's role (Admin / Regular User / Research Student).",
+      roles: ['admin']
     },
     {
       target: "#donor-registration",
       content: "Here you can register a new donor! The \"Medical history\" field is optional :) Don't forget to enter the donor's birthdate.",
+      roles: ['admin', 'user']
     },
     {
       target: "#add-donation",
       content: "Click here to add a new donation! Firstly find the donor in the system, if not found, then register one! After all choose the donation type (Blood / Plasma) and that's it!",
+      roles: ['admin', 'user']
     },
     {
       target: "#request-blood",
       content: "Need a blood from an inventory? Just request one! Choose the blood type you need and take it if exists. Otherwise take an alternative.",
+      roles: ['admin', 'user']
     },
     {
       target: "#request-blood-er",
       content: "You are free to request amount of blood for your emergency!",
+      roles: ['admin', 'user']
     },
     {
       target: "#blood-inventory",
       content: "Here in the table you can find the blood inventory. Available blood types and their amount.",
+      roles: ['admin', 'user']
+    },
+    {
+      target: ".std",
+      content: "Here in the table you can find our blood inventory. Research it in your time!",
+      roles: ['student']
     },
     {
       target: "#download-logs",
       content: "Here you can download audit logs for actions made here. The document will be in pdf format.",
+      roles: ['admin']
     },
   ]);
+
+  const getStepsByUserType = (userType) => {
+    return steps.filter(item => item.roles.includes(userType));
+  };
 
   const stepsForStudent = [
     {
@@ -351,7 +371,7 @@ const Dashboard = () => {
   return (
       <div className="dashboard-container">
         <Joyride
-            steps={isResearchStudent ? stepsForStudent : steps}
+            steps={isAdmin ? getStepsByUserType('admin') : isResearchStudent ? getStepsByUserType('student') : getStepsByUserType('user')}
             continuous={true}
             showProgress={true}
             showSkipButton={true}
@@ -480,9 +500,10 @@ const Dashboard = () => {
                     : "Show Blood Inventory"}
               </button>
 
-              <button id="download-logs"
-                      onClick={handleDownloadLogs}>Download Logs
-              </button>
+              { isAdmin && <button id="download-logs"
+                       onClick={handleDownloadLogs}>Download Logs
+                </button>
+              }
             </div>
         )}
 
